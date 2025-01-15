@@ -1,0 +1,25 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 space-y-3 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-center">Login</h2>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+               <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    formControlName="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    formControlName="password" id="password" required>
+            </div>
+            <button type="submit"
+                class="w-full py-2 mt-4 text-white bg-blue-600 rounded-md hover:bg-blue-700">Login</button>
+        </form>
+    </div>
+
+    <!-- Display login error message if it exists -->
+    <div *ngIf="errorMessage" [ngClass]="messageVisible ? 'fade-in' : 'fade-out'"
+        class="fixed top-10 inset-x-0 mx-auto px-3 py-2 text-white bg-red-500 rounded w-4/5 text-center">
+        {{ errorMessage }}
+    </div>
+</div>

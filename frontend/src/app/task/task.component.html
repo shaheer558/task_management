@@ -1,0 +1,197 @@
+<div class="p-6">
+    <!-- Task Management Heading with Logout Button on the Right -->
+    <div class="flex justify-between items-center p-4 bg-gray-100 shadow-md">
+        <h1 class="text-3xl font-bold text-gray-800">Task Management</h1>
+        <div class="flex space-x-2">
+            <!-- <button (click)="navigateToAddUser()"
+                class="flex items-center bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                Add User
+            </button> -->
+            <button (click)="logout()"
+                class="flex items-center bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="h-5 w-5 mr-1 text-white"
+                    fill="currentColor"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                    <path
+                        d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-2">
+        <div class="flex items-center space-x-4 mt-5">
+            <div class="filters-container flex items-center justify-between w-full space-x-4">
+                <div class="p-4 bg-gray-50 rounded shadow-lg">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div *ngIf="userRole === 'admin'">
+                            <label for="assignedTo" class="block text-sm font-medium text-gray-700">Assigned To:</label>
+                            <input type="text" id="assignedTo" [(ngModel)]="filters.assignedTo"
+                                placeholder="Search by email"
+                                class="mt-1 block w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status:</label>
+                            <select id="status" [(ngModel)]="filters.status"
+                                class="mt-1 block w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">All</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Dev Completed">Dev Completed</option>
+                            </select>
+                        </div>
+                        <div class="sort-filter">
+                            <label for="sort" class="block text-sm font-medium text-gray-700">Sort by:</label>
+                            <select id="sort"
+                                class="mt-1 block w-full border border-gray-300 p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                                (change)="onSortChange($event)">
+                                <option value="">None</option>
+                                <option value="latest">Latest</option>
+                                <option value="longest">Longest Task</option>
+                                <option value="shortest">Shortest Task</option>
+                                <option *ngIf="userRole === 'admin'" value="priority">Priority</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-grow relative flex">
+                    <!-- "Title" Filter -->
+                    <div class="relative flex w-4/6 ml-auto">
+                        <input type="text" [(ngModel)]="filters.title" placeholder="Search by title"
+                            class="border border-slate-400 p-1 text-lg rounded-l w-full outline-slate-500" />
+                        <button (click)="loadTasks()"
+                            class="p-2 border border-slate-400 border-l-0 rounded-r hover:bg-slate-200 transition duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button (click)="loadTasks()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Apply
+                Filters</button>
+            <button *ngIf="userRole === 'admin'" (click)="navigateToAddTask()"
+                class="mt-4 ml-2 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition duration-200">Add
+                Task</button>
+        </div>
+    </div>
+
+    <!-- Task List -->
+    <div class="overflow-x-auto shadow-lg rounded-lg mt-5">
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th scope="col" class="py-3 px-6 text-left text-sm font-semibold text-gray-600 border-b">Title</th>
+                    <th scope="col" class="py-3 px-6 text-left text-sm font-semibold text-gray-600 border-b">Description
+                    </th>
+                    <th scope="col" class="py-3 px-2 text-center text-sm font-semibold text-gray-600 border-b">Estimated
+                        Hours</th>
+                    <th scope="col" class="py-3 px-2 text-center text-sm font-semibold text-gray-600 border-b">Actual
+                        Hours</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-gray-600 border-b">Status
+                    </th>
+                    <th *ngIf="userRole === 'admin'" scope="col"
+                        class="py-3 px-6 text-left text-sm font-semibold text-gray-600 border-b">Assigned To</th>
+                    <th *ngIf="userRole === 'user'" scope="col"
+                        class="py-3 px-6 text-left text-sm font-semibold text-gray-600 border-b">Assigned By</th>
+                    <th *ngIf="userRole === 'admin'" scope="col"
+                        class="py-3 px-6 text-center text-sm font-semibold text-gray-600 border-b">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let task of tasks" class= "transition duration-200"
+                [ngClass]="{'bg-red-100': task.actualHours > task.estimatedHours, 'hover:bg-gray-100': task.actualHours <= task.estimatedHours}">
+                <td class="py-4 px-6 border-b text-sm text-gray-800 relative">
+                    <div class="flex justify-between items-start">
+                        <span>{{ task.title }}</span>
+                        <span *ngIf="userRole === 'admin'" [ngClass]="{
+                            'text-green-500': task.priority === 'Low',
+                            'text-yellow-500': task.priority === 'Medium',
+                            'text-red-500': task.priority === 'High',
+                            'blink': task.status === 'Pending' && task.priority === 'High'
+                        }" class="text-xs font-bold absolute top-1 right-2">
+                            {{ task.priority }}
+                        </span>
+                    </div>
+                </td>
+                
+                    <td class="py-4 px-6 border-b text-sm text-gray-800">{{ task.description }}</td>
+                    <td class="py-4 px-2 border-b text-sm text-center text-gray-800">{{ task.estimatedHours }}</td>
+                    <td class="py-4 px-2 border-b text-sm text-center text-gray-800">
+                        {{ (task.status === 'Completed' || task.status === 'Dev Completed') ? task.actualHours : 'N/A'
+                        }}
+                    </td>
+                    <td class="py-4 px-6 border-b text-sm text-center text-gray-800">
+                        <select *ngIf="userRole === 'user' && task.status !== 'Dev Completed'" [(ngModel)]="task.status"
+                            (change)="updateStatus(task, task.status)">
+                            <option value="Pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                            <option value="In Progress">In Progress</option>
+                        </select>
+                        <span *ngIf="userRole === 'user' && task.status === 'Dev Completed'">{{ task.status }}</span>
+                        <span *ngIf="userRole === 'admin'">
+                            {{ task.status }}
+                        </span>
+                    </td>
+                    <td *ngIf="userRole === 'admin'" class="py-4 px-6 border-b text-sm text-gray-800">
+                        {{ task.assignedToDetails ? task.assignedToDetails.name + ' (' + task.assignedToDetails.email +
+                        ')' : 'Unassigned' }}
+                    </td>
+                    <td *ngIf="userRole === 'user'" class="py-4 px-6 border-b text-sm text-gray-800">
+                        {{ task.assignedByDetails ? task.assignedByDetails.name + ' (' + task.assignedByDetails.email +
+                        ')' : 'Unknown' }}
+                    </td>
+                    <td *ngIf="userRole === 'admin'" class="py-4 px-6 border-b text-sm text-center">
+                        <div class="flex">
+                            <button (click)="confirmDeleteTask(task)"
+                                class="bg-red-500 hover:bg-red-600 text-white text-sm p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-red-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="h-4 w-4"
+                                    fill="currentColor">
+                                    <path
+                                        d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                                </svg>
+                            </button>
+                            <button (click)="confirmDevComplete(task)" [disabled]="task.status !== 'Completed'"
+                                [ngClass]="{'bg-green-500 hover:bg-green-600': task.status === 'Completed', 'bg-slate-300': task.status !== 'Completed'}"
+                                class="ml-2 cursor-pointer text-white text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="h-4 w-4"
+                                    fill="currentColor">
+                                    <path
+                                        d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Confirmation Modal -->
+<div *ngIf="showConfirmationModal" class="modal">
+    <div class="modal-content">
+        <p>Are you sure you want to delete this task?</p>
+        <button (click)="deleteTask(taskToDelete)" class="border px-2 py-1 rounded bg-red-500 text-white">Yes</button>
+        <button (click)="cancelDelete()" class="border px-2 py-1 rounded bg-gray-500 text-white">No</button>
+    </div>
+</div>
+
+<!-- Display login error message if it exists -->
+<div *ngIf="errorMessage" [ngClass]="messageVisible ? 'fade-in' : 'fade-out'"
+    class="fixed top-10 inset-x-0 mx-auto px-3 py-2 text-white bg-red-500 rounded w-4/5 text-center">
+    {{ errorMessage }}
+</div>
+
+<!-- Display login success message if it exists -->
+<div *ngIf="successMessage" [ngClass]="messageVisible ? 'fade-in' : 'fade-out'"
+    class="fixed top-10 inset-x-0 mx-auto px-3 py-2 text-white bg-green-500 rounded w-4/5 text-center">
+    {{ successMessage }}
+</div>
