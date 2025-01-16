@@ -5,7 +5,7 @@ const TaskSchema = new mongoose.Schema({
   description: { type: String },
   estimatedHours: { type: Number, required: true },
   actualHours: { type: Number, default: 0 },
-  status: { type: String, enum: ['Pending', 'In Progress', 'Completed', 'Dev Completed'], default: 'Pending' },
+  status: { type: String, enum: ['Pending', 'In Progress', 'Completed', 'Approved'], default: 'Pending' },
   pauseInterval: { type: Number, default: 0 }, // Tracks the total paused hours
   pauseTime: { type: Date }, // Tracks when task status changed to 'Paused'
   startTime: { type: Date }, // Tracks when task status changed to 'In Progress'

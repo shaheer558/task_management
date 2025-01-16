@@ -42,20 +42,31 @@ export class AuthService {
       { withCredentials: true }
     ).pipe(
       tap(() => {
-        // Clear local storage on logout
-        localStorage.removeItem(this.roleKey);
-        localStorage.removeItem(this.emailKey);
+        if (this.isBrowser) {
+          localStorage.removeItem(this.roleKey);
+          localStorage.removeItem(this.emailKey);
+        } else{
+          console.warn('LocalStorage is not available');
+        }
       })
     );
   }
 
   // Method to get user role from local storage
   getUserRole(): string {
-    return localStorage.getItem(this.roleKey) || '';
+    if (this.isBrowser) {
+      return localStorage.getItem(this.roleKey) || '';
+    }
+    console.warn('localStorage is not available.');
+    return '';
   }
 
   // Method to get user email from local storage
   getUserEmail(): string {
-    return localStorage.getItem(this.emailKey) || '';
+    if (this.isBrowser) {
+      return localStorage.getItem(this.emailKey) || '';
+    }
+    console.warn('localStorage is not available.');
+    return '';
   }
 }

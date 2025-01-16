@@ -56,7 +56,7 @@ async function updateActualHours() {
   try {
     const tasks = await Task.find();
     for (const task of tasks) {
-      if ((!(task.status === 'Completed' || task.status === 'Dev Completed')) && (task.startTime)) {
+      if ((!(task.status === 'Completed' || task.status === 'Approved')) && (task.startTime)) {
         // Calculate actual hours
         const now = new Date();
         const totalDuration = Math.abs(now - task.startTime) / 36e5; // Calculate total hours

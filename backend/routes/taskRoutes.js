@@ -188,7 +188,7 @@ async function sendMail(task, email, isApproval = false) {
 
 async function calcActualHours(task) {
   // Calculate actual hours
-  if ((!(task.status === 'Completed' || task.status === 'Dev Completed')) && (task.startTime)) {
+  if ((!(task.status === 'Completed' || task.status === 'Approved')) && (task.startTime)) {
     const now = new Date();
     const totalDuration = Math.abs(now - task.startTime) / 36e5; // Calculate total hours
     const hoursWorked = totalDuration - task.pauseInterval; // Subtract pauseInterval from total hours
@@ -229,15 +229,15 @@ router.patch('/:title', async (req, res) => {
     }
 
     if (role === 'user') {
-      if (task.status === 'Dev Completed') {
-        return res.status(400).json({ message: 'User cannot change status from Dev Completed' });
+      if (task.status === 'Approved') {
+        return res.status(400).json({ message: 'User cannot change status from Approved' });
       }
-      if (status === 'Dev Completed') {
-        return res.status(400).json({ message: 'User cannot set status to Dev Completed' });
+      if (status === 'Approved') {
+        return res.status(400).json({ message: 'User cannot set status to Approved' });
       }
     } else if (role === 'admin') {
-      if (status !== 'Dev Completed') {
-        return res.status(400).json({ message: 'Admin can only set status to Dev Completed' });
+      if (status !== 'Approved') {
+        return res.status(400).json({ message: 'Admin can only set status to Approved' });
       }
     }
 
@@ -256,16 +256,16 @@ router.patch('/:title', async (req, res) => {
     } else if (status === 'Pending' && task.startTime && !task.pauseTime) {
       task.pauseTime = new Date(); // Set pauseTime when task moves to 'Pending'
     }
-    else if (status === 'Dev Completed' && role === 'user') {
-      //user cannot change status to dev completed
+    else if (status === 'Approved' && role === 'user') {
+      //user cannot change status to Approved
       return res.status(400).json({ message: 'Invalid Input' });
     }
-    else if (status === 'Dev Completed' && task.status !== 'Completed') {
-      //if status can only be changed from completed to dev completed
-      return res.status(400).json({ message: 'Status can only be changed to Dev Completed if the current status is Completed' });
+    else if (status === 'Approved' && task.status !== 'Completed') {
+      //if status can only be changed from completed to Approved
+      return res.status(400).json({ message: 'Status can only be changed to Approved if the current status is Completed' });
     }
-    else if (status === 'Dev Completed') {
-      // if all conditions are correct to change status to dev completed
+    else if (status === 'Approved') {
+      // if all conditions are correct to change status to Approved
       await sendMail(task, task.assignedTo, true); //send mail to user
     }
 
